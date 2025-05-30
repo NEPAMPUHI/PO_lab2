@@ -10,7 +10,7 @@ using namespace std;
 using namespace chrono;
 
 static const int threads_num = 2;
-static const unsigned long long arr_size = 20000;
+static const unsigned long long arr_size = 10000;
 int arr[arr_size];
 
 void fill_array() {
@@ -19,7 +19,7 @@ void fill_array() {
     }
 }
 
-void solution_without_parallelization(int& number, int& largest) {
+void solution_without_parallelization(unsigned long long& number, int& largest) {
     number = 0;
     largest = 0;
     for (int i = 0; i < arr_size; i++) {
@@ -31,8 +31,8 @@ void solution_without_parallelization(int& number, int& largest) {
     }
 }
 
-void process_section_with_mutex(int start,  int end, mutex &mtx, int &number, int &largest) {
-    int local_count = 0;
+void process_section_with_mutex(int start,  int end, mutex &mtx, unsigned long long &number, int &largest) {
+    unsigned long long local_count = 0;
     int local_max = 0;
     for (int i = start; i < end; i++) {
         if (arr[i] > 20) {
@@ -47,7 +47,7 @@ void process_section_with_mutex(int start,  int end, mutex &mtx, int &number, in
         largest = local_max;
 }
 
-void solution_with_mutex(int& number, int& largest) {
+void solution_with_mutex(unsigned long long& number, int& largest) {
     number = 0;
     largest = 0;
     mutex mtx;
@@ -82,7 +82,7 @@ void process_section_with_CAS(int start, int end, atomic<unsigned long long> &co
     while (local_max > current_max && max.compare_exchange_weak(current_max, local_max, memory_order_relaxed)) {}
 }
 
-void solution_with_CAS(int& number, int& largest) {
+void solution_with_CAS(unsigned long long& number, int& largest) {
     atomic<unsigned long long> count = 0;
     atomic<int> max = 0;
     vector<thread> threads;
@@ -103,7 +103,7 @@ void solution_with_CAS(int& number, int& largest) {
 }
 
 bool is_correct(int n, int l) {
-    int number;
+    unsigned long long number;
     int largest;
     solution_without_parallelization(number, largest);
     return number == n && largest == l;
@@ -119,7 +119,7 @@ int main() {
     srand(123456789);
     fill_array();
 
-    int number;
+    unsigned long long number;
     int largest;
 
     auto begin = high_resolution_clock::now();
