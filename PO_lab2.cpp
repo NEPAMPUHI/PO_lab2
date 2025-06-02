@@ -9,12 +9,12 @@
 using namespace std;
 using namespace chrono;
 
-static const int threads_num = 2;
-static const unsigned long long arr_size = 10000;
+static const int threads_num = 4;
+static const unsigned long long arr_size = 2000000;
 int arr[arr_size];
 
 void fill_array() {
-    for (int i = 0; i < arr_size; i++) {
+    for (unsigned long long i = 0; i < arr_size; i++) {
         arr[i] = rand() % 30 + 1;
     }
 }
@@ -79,7 +79,7 @@ void process_section_with_CAS(int start, int end, atomic<unsigned long long> &co
 
     count.fetch_add(local_count, memory_order_relaxed);
     int current_max = max.load(memory_order_relaxed);
-    while (local_max > current_max && max.compare_exchange_weak(current_max, local_max, memory_order_relaxed)) {}
+    while (local_max > current_max && !max.compare_exchange_weak(current_max, local_max, memory_order_relaxed)) {}
 }
 
 void solution_with_CAS(unsigned long long& number, int& largest) {
@@ -109,7 +109,7 @@ bool is_correct(int n, int l) {
     return number == n && largest == l;
 }
 
-void print_results(const string& solution_type, double duration, int n, int l) {
+void print_results(const string& solution_type, double duration, unsigned long long n, int l) {
     cout << solution_type << ": " << duration << " seconds" << endl;
     cout << "The number = " << n << ", the largest = " << l << endl << endl;
     //cout << "Solution is " << (is_correct(n, l) ? "" : "NOT ") << "correct" << endl << endl;
